@@ -1,0 +1,85 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Global Options:
+    Background Color: 38; 38; 42
+    Fixed Frame: map
+    Frame Rate: 30
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Enabled: true
+      Cell Size: 1
+    - Class: rviz_default_plugins/Map
+      Name: Static Map
+      Enabled: true
+      Topic:
+        Value: /map
+      Alpha: 0.65
+    - Class: rviz_default_plugins/RobotModel
+      Name: Semantic Rover
+      Enabled: true
+      Description Source: Topic
+      Description Topic:
+        Value: /robot_description
+    - Class: rviz_default_plugins/LaserScan
+      Name: Lidar Obstacles
+      Enabled: true
+      Topic:
+        Value: /scan
+      Style: Points
+      Size (m): 0.04
+    - Class: rviz_default_plugins/PointCloud2
+      Name: YOLO Semantic Obstacles
+      Enabled: true
+      Topic:
+        Value: /yolo/obstacles
+      Style: Spheres
+      Size (m): 0.08
+      Color Transformer: FlatColor
+      Color: 255; 60; 20
+    - Class: rviz_default_plugins/PointCloud2
+      Name: RGBD All Obstacles
+      Enabled: true
+      Topic:
+        Value: /depth/obstacles
+      Style: Points
+      Size (m): 0.04
+      Color Transformer: FlatColor
+      Color: 40; 180; 255
+    - Class: rviz_default_plugins/Map
+      Name: Local Costmap
+      Enabled: true
+      Topic:
+        Value: /local_costmap/costmap
+      Alpha: 0.55
+    - Class: rviz_default_plugins/Path
+      Name: Nav2 Plan
+      Enabled: true
+      Topic:
+        Value: /plan
+      Line Style: Lines
+      Line Width: 0.04
+    - Class: rviz_default_plugins/Image
+      Name: YOLO Camera
+      Enabled: true
+      Topic:
+        Value: /yolo/annotated_image
+  Enabled: true
+  Name: root
+Tools:
+  - Class: rviz_default_plugins/Interact
+  - Class: rviz_default_plugins/MoveCamera
+  - Class: rviz_default_plugins/SetInitialPose
+    Topic: /initialpose
+  - Class: rviz_default_plugins/SetGoal
+    Topic: /goal_pose
+Views:
+  Current:
+    Class: rviz_default_plugins/TopDownOrtho
+    Name: Top Down
+    Scale: 18
+    X: 0
+    Y: 0

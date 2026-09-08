@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<robot name="semantic_rover">
+  <material name="navy"><color rgba="0.05 0.18 0.32 1"/></material>
+  <material name="black"><color rgba="0.03 0.03 0.03 1"/></material>
+  <material name="silver"><color rgba="0.65 0.68 0.72 1"/></material>
+
+  <link name="base_footprint"/>
+  <joint name="base_joint" type="fixed"><parent link="base_footprint"/><child link="base_link"/><origin xyz="0 0 0.18"/></joint>
+  <link name="base_link">
+    <inertial><mass value="18"/><origin xyz="0 0 0.04"/><inertia ixx="0.55" ixy="0" ixz="0" iyy="0.75" iyz="0" izz="1.0"/></inertial>
+    <visual><geometry><box size="0.72 0.52 0.26"/></geometry><material name="navy"/></visual>
+    <collision><geometry><box size="0.72 0.52 0.26"/></geometry></collision>
+  </link>
+  <gazebo reference="base_link"><material>Gazebo/Blue</material></gazebo>
+
+  <link name="front_bumper"><visual><geometry><box size="0.08 0.58 0.12"/></geometry><material name="silver"/></visual><collision><geometry><box size="0.08 0.58 0.12"/></geometry></collision></link>
+  <joint name="front_bumper_joint" type="fixed"><parent link="base_link"/><child link="front_bumper"/><origin xyz=".39 0 -.02"/></joint>
+  <link name="status_light"><visual><geometry><cylinder radius=".045" length=".035"/></geometry><material name="silver"/></visual></link>
+  <joint name="status_light_joint" type="fixed"><parent link="base_link"/><child link="status_light"/><origin xyz="-.16 0 .16"/></joint>
+  <gazebo reference="status_light"><material>Gazebo/Green</material></gazebo>
+
+  <link name="left_wheel">
+    <inertial><mass value="1.2"/><inertia ixx=".018" ixy="0" ixz="0" iyy=".018" iyz="0" izz=".03"/></inertial>
+    <visual><origin rpy="1.5708 0 0"/><geometry><cylinder radius=".16" length=".07"/></geometry><material name="black"/></visual>
+    <collision><origin rpy="1.5708 0 0"/><geometry><cylinder radius=".16" length=".07"/></geometry></collision>
+  </link>
+  <joint name="left_wheel_joint" type="continuous"><parent link="base_link"/><child link="left_wheel"/><origin xyz="-.08 .295 -.04"/><axis xyz="0 1 0"/><limit effort="25" velocity="15"/></joint>
+  <link name="right_wheel">
+    <inertial><mass value="1.2"/><inertia ixx=".018" ixy="0" ixz="0" iyy=".018" iyz="0" izz=".03"/></inertial>
+    <visual><origin rpy="1.5708 0 0"/><geometry><cylinder radius=".16" length=".07"/></geometry><material name="black"/></visual>
+    <collision><origin rpy="1.5708 0 0"/><geometry><cylinder radius=".16" length=".07"/></geometry></collision>
+  </link>
+  <joint name="right_wheel_joint" type="continuous"><parent link="base_link"/><child link="right_wheel"/><origin xyz="-.08 -.295 -.04"/><axis xyz="0 1 0"/><limit effort="25" velocity="15"/></joint>
+  <gazebo reference="left_wheel"><mu1>1.2</mu1><mu2>1.2</mu2></gazebo>
+  <gazebo reference="right_wheel"><mu1>1.2</mu1><mu2>1.2</mu2></gazebo>
+
+  <link name="caster"><inertial><mass value=".3"/><inertia ixx=".001" ixy="0" ixz="0" iyy=".001" iyz="0" izz=".001"/></inertial><visual><geometry><sphere radius=".07"/></geometry><material name="silver"/></visual><collision><geometry><sphere radius=".07"/></geometry></collision></link>
+  <joint name="caster_joint" type="fixed"><parent link="base_link"/><child link="caster"/><origin xyz=".27 0 -.12"/></joint>
+  <gazebo reference="caster"><mu1>.02</mu1><mu2>.02</mu2></gazebo>
+
+  <link name="sensor_mast"><visual><geometry><cylinder radius=".035" length=".55"/></geometry><material name="silver"/></visual></link>
+  <joint name="mast_joint" type="fixed"><parent link="base_link"/><child link="sensor_mast"/><origin xyz=".15 0 .405"/></joint>
+  <link name="laser_frame"><visual><geometry><cylinder radius=".09" length=".07"/></geometry><material name="black"/></visual></link>
+  <joint name="laser_joint" type="fixed"><parent link="sensor_mast"/><child link="laser_frame"/><origin xyz="0 0 .31"/></joint>
+  <link name="camera_link"><visual><geometry><box size=".12 .18 .10"/></geometry><material name="black"/></visual></link>
+  <joint name="camera_joint" type="fixed"><parent link="sensor_mast"/><child link="camera_link"/><origin xyz=".08 0 .18"/></joint>
+  <link name="camera_optical_frame"/>
+  <joint name="camera_optical_joint" type="fixed"><parent link="camera_link"/><child link="camera_optical_frame"/><origin xyz=".065 0 0" rpy="-1.5708 0 -1.5708"/></joint>
+
+  <gazebo>
+    <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
+      <ros><namespace>/</namespace><remapping>cmd_vel:=/cmd_vel</remapping><remapping>odom:=/odom</remapping></ros>
+      <update_rate>50</update_rate><left_joint>left_wheel_joint</left_joint><right_joint>right_wheel_joint</right_joint>
+      <wheel_separation>.59</wheel_separation><wheel_diameter>.32</wheel_diameter>
+      <max_wheel_torque>25</max_wheel_torque><max_wheel_acceleration>2.5</max_wheel_acceleration>
+      <publish_odom>true</publish_odom><publish_odom_tf>true</publish_odom_tf><publish_wheel_tf>true</publish_wheel_tf>
+      <odometry_frame>odom</odometry_frame><robot_base_frame>base_footprint</robot_base_frame>
+    </plugin>
+  </gazebo>
+  <gazebo reference="laser_frame"><sensor name="lidar" type="ray"><always_on>true</always_on><update_rate>8</update_rate><ray><scan><horizontal><samples>180</samples><min_angle>-3.14159</min_angle><max_angle>3.14159</max_angle></horizontal></scan><range><min>.15</min><max>12</max><resolution>.03</resolution></range></ray><plugin name="lidar_ros" filename="libgazebo_ros_ray_sensor.so"><ros><remapping>~/out:=/scan</remapping></ros><output_type>sensor_msgs/LaserScan</output_type><frame_name>laser_frame</frame_name></plugin></sensor></gazebo>
+  <gazebo reference="camera_link"><sensor name="rgbd" type="depth"><always_on>true</always_on><update_rate>4</update_rate><camera><horizontal_fov>1.15</horizontal_fov><image><width>320</width><height>240</height><format>R8G8B8</format></image><clip><near>.15</near><far>6</far></clip></camera><plugin name="rgbd_ros" filename="libgazebo_ros_camera.so"><ros><remapping>image_raw:=/camera/image_raw</remapping><remapping>camera_info:=/camera/camera_info</remapping><remapping>depth/image_raw:=/camera/depth/image_raw</remapping></ros><camera_name>camera</camera_name><frame_name>camera_optical_frame</frame_name></plugin></sensor></gazebo>
+</robot>
